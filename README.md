@@ -67,7 +67,7 @@ http://localhost:8080
 
 ---
 
-## Estrutura do projeto
+## 🗂️ Estrutura do projeto
 
 ```
 src/main/java/com/testetecnico/investmentsimulator/
@@ -82,17 +82,66 @@ src/main/java/com/testetecnico/investmentsimulator/
 ├── dto/
 │   ├── SimulationRequestDTO.java
 │   └── SimulationResponseDTO.java
+├── mapper/
+│   └── SimulationMapper.java
 ├── repository/
 │   ├── InvestmentSimulationRepository.java
 │   └── SimulationResultRepository.java
 └── service/
-    ├── SimulationService.java
-    └── SimulationCalculatorService.java
+    ├── impl
+    │   ├── SimulationService.java           ← implementação
+    │   └── SimulationCalculatorService.java ← implementação
+    ├── SimulationCalculator.java        ← interface
+    └── Simulation.java                  ← interface
 ```
 
 ---
 
-## Endpoints
+## 🏛️ Decisões de arquitetura
+
+### Separação em camadas
+
+O projeto segue uma arquitetura em camadas com responsabilidades bem definidas:
+
+- **Controller** — recebe a requisição HTTP e delega pro service. Sem lógica de negócio
+- **Service** — orquestra o fluxo: monta a entidade, delega o cálculo, salva no banco e retorna o DTO
+- **Calculator** — responsável exclusivamente pelo cálculo financeiro (juros compostos e IR)
+- **Mapper** — converte entidades para DTOs. Mantém essa responsabilidade fora do service
+- **Repository** — acesso ao banco de dados via Spring Data JPA
+
+### Interfaces
+
+O projeto utiliza interfaces para desacoplar contratos de implementações, seguindo o **Dependency Inversion Principle**:
+
+- `Simulation` — contrato do `SimulationService`
+- `SimulationCalculator` — contrato do `SimulationCalculatorService`
+
+O `SimulationService` depende da interface `SimulationCalculator`, não da implementação concreta — facilitando testes e futuras trocas de implementação.
+
+### Separação do cálculo
+
+O `SimulationCalculatorService` foi organizado em métodos privados com responsabilidades únicas:
+
+- `calculateMonthlyRate` — converte taxa anual para mensal
+- `calculateFinalValue` — executa o loop de juros compostos
+- `calculateTotalInvested` — soma aporte inicial e aportes mensais
+- `taxRate` — retorna a alíquota de IR pela tabela regressiva
+- `buildResult` — monta o objeto `SimulationResult`
+
+### DTOs
+
+A API nunca expõe entidades diretamente — toda comunicação usa DTOs:
+
+- `SimulationRequestDTO` — entrada com validações (`@NotNull`, `@Positive`, etc.)
+- `SimulationResponseDTO` — saída com dados da simulação e do resultado calculado, achatando duas entidades em um único objeto
+
+### Mapper
+
+A conversão de entidade para DTO foi extraída para o `SimulationMapper`, mantendo o service focado em orquestração.
+
+---
+
+## 📡 Endpoints
 
 | Método | Rota | Descrição | Status |
 |---|---|---|---|
@@ -103,7 +152,7 @@ src/main/java/com/testetecnico/investmentsimulator/
 
 ---
 
-## Exemplos de requisição
+## 📨 Exemplos de requisição
 
 ### POST /simulations
 
@@ -158,7 +207,7 @@ DELETE http://localhost:8080/simulations/3f2a1b4c-0000-0000-0000-000000000000
 
 ---
 
-## Variáveis de configuração
+## ⚙️ Variáveis de configuração
 
 As configurações de banco estão em `src/main/resources/application.properties` e devem bater com o `docker-compose.yml`:
 
@@ -171,7 +220,7 @@ As configurações de banco estão em `src/main/resources/application.properties
 
 ---
 
-## Lógica de cálculo
+## 🧮 Lógica de cálculo
 
 A simulação utiliza **juros compostos mensais** com base na taxa anual informada:
 
@@ -195,7 +244,7 @@ O imposto de renda é estimado com base na **tabela regressiva da Receita Federa
 
 ---
 
-## Modelo de dados
+## 🗄️ Modelo de dados
 
 ### investment_simulation
 
@@ -224,9 +273,14 @@ O imposto de renda é estimado com base na **tabela regressiva da Receita Federa
 
 ---
 
-## Próximos passos
+## 🔮 Próximos passos
 
 ### Testes unitários
+
+Adicionar cobertura de testes com JUnit 5 e Mockito:
+
+- Testes unitários do `SimulationCalculatorService` — validando o cálculo de juros compostos, total investido e alíquotas de IR para cada faixa de prazo
+- Testes unitários do `SimulationService` — mockando o repositório e o calculator para testar a orquestração isoladamente
 
 ### Taxas automáticas de mercado
 
@@ -248,3 +302,9 @@ investment_product
 ```
 
 O usuário escolheria o produto e a taxa seria preenchida automaticamente. Essa abordagem também permite atualizar as taxas periodicamente via job agendado (`@Scheduled` do Spring).
+
+### Outras melhorias
+
+- **Versionamento de API** — prefixo `/v1/simulations` para permitir evolução sem quebrar clientes existentes
+- **Variáveis de ambiente** — externalizar credenciais do banco via perfis Spring (`application-dev.properties`, `application-prod.properties`)
+- **Autenticação** — Spring Security com JWT para proteger os endpoints
