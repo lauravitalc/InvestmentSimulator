@@ -1,14 +1,15 @@
-package com.testetecnico.investmentsimulator.service;
+package com.testetecnico.investmentsimulator.service.impl;
 
 import com.testetecnico.investmentsimulator.domain.entity.InvestmentSimulation;
 import com.testetecnico.investmentsimulator.domain.entity.SimulationResult;
+import com.testetecnico.investmentsimulator.service.SimulationCalculator;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Component
-public class SimulationCalculatorService {
+public class SimulationCalculatorService implements SimulationCalculator {
     public SimulationResult calculate(InvestmentSimulation simulation) {
         BigDecimal monthlyRate = simulation.getAnnualRate()
                 .divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)

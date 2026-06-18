@@ -2,7 +2,7 @@ package com.testetecnico.investmentsimulator.controller;
 
 import com.testetecnico.investmentsimulator.dto.SimulationRequestDTO;
 import com.testetecnico.investmentsimulator.dto.SimulationResponseDTO;
-import com.testetecnico.investmentsimulator.service.SimulationService;
+import com.testetecnico.investmentsimulator.service.Simulation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequestMapping("/simulations")
 @RequiredArgsConstructor
 public class SimulationController {
-    private final SimulationService _simulationService;
+    private final Simulation _simulationService;
 
     @PostMapping
     public ResponseEntity<SimulationResponseDTO> create(@RequestBody @Valid SimulationRequestDTO request) {
@@ -41,5 +41,4 @@ public class SimulationController {
         _simulationService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

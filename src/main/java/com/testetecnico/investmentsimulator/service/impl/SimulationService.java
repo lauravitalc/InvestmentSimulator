@@ -1,10 +1,11 @@
-package com.testetecnico.investmentsimulator.service;
+package com.testetecnico.investmentsimulator.service.impl;
 
 import com.testetecnico.investmentsimulator.domain.entity.InvestmentSimulation;
 import com.testetecnico.investmentsimulator.domain.entity.SimulationResult;
 import com.testetecnico.investmentsimulator.dto.SimulationRequestDTO;
 import com.testetecnico.investmentsimulator.dto.SimulationResponseDTO;
 import com.testetecnico.investmentsimulator.repository.InvestmentSimulationRepository;
+import com.testetecnico.investmentsimulator.service.Simulation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class SimulationService {
+public class SimulationService implements Simulation {
     private final InvestmentSimulationRepository _simulationRepository;
     private final SimulationCalculatorService _calculatorService;
 
