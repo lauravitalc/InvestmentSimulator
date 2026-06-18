@@ -47,7 +47,6 @@ public class SimulationCalculatorService {
         return result;
     }
 
-    // avaliar passar isso pro banco
     private BigDecimal taxRate(int months) {
         if (months <= 6)  return new BigDecimal("0.225");
         if (months <= 12) return new BigDecimal("0.200");
