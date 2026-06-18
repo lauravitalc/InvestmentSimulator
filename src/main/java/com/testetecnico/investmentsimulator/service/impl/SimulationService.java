@@ -4,6 +4,7 @@ import com.testetecnico.investmentsimulator.domain.entity.InvestmentSimulation;
 import com.testetecnico.investmentsimulator.domain.entity.SimulationResult;
 import com.testetecnico.investmentsimulator.dto.SimulationRequestDTO;
 import com.testetecnico.investmentsimulator.dto.SimulationResponseDTO;
+import com.testetecnico.investmentsimulator.exception.SimulationNotFoundException;
 import com.testetecnico.investmentsimulator.mapper.SimulationMapper;
 import com.testetecnico.investmentsimulator.repository.InvestmentSimulationRepository;
 import com.testetecnico.investmentsimulator.service.Simulation;
@@ -46,13 +47,13 @@ public class SimulationService implements Simulation {
 
     public SimulationResponseDTO findById(UUID id) {
         InvestmentSimulation simulation = _simulationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Simulation not found"));
+                .orElseThrow(() -> new SimulationNotFoundException(id));
         return _mapper.toResponseDTO(simulation);
     }
 
     public void delete(UUID id) {
         _simulationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Simulation not found"));
+                .orElseThrow(() -> new SimulationNotFoundException(id));
         _simulationRepository.deleteById(id);
     }
 }
