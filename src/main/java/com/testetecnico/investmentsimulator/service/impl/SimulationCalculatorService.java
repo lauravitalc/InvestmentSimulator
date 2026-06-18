@@ -47,9 +47,7 @@ public class SimulationCalculatorService implements SimulationCalculator {
                     .add(simulation.getMonthlyContribution());
         }
 
-        finalValue = finalValue.setScale(2, RoundingMode.HALF_UP);
-
-        return finalValue;
+        return finalValue.setScale(2, RoundingMode.HALF_UP);
     }
 
     private SimulationResult buildResult(InvestmentSimulation simulation, BigDecimal finalValue, BigDecimal totalInvested, BigDecimal totalReturn, BigDecimal estimatedTax, BigDecimal netValue) {
