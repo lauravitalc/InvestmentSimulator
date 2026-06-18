@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "investment_simulation")
 public class InvestmentSimulation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     public UUID id;

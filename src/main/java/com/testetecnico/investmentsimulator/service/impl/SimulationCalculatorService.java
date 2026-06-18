@@ -17,13 +17,19 @@ public class SimulationCalculatorService implements SimulationCalculator {
         BigDecimal finalValue = initial;
         finalValue = calculateFinalValue(simulation, finalValue, monthlyRate);
 
+        BigDecimal monthlyMultiply = simulation.getMonthlyContribution()
+                .multiply(BigDecimal.valueOf(simulation.getTimeMonths()));
         BigDecimal totalInvested = initial
-                .add(simulation.getMonthlyContribution()
-                    .multiply(BigDecimal.valueOf(simulation.getTimeMonths())))
+                .add(monthlyMultiply)
                 .setScale(2, RoundingMode.HALF_UP);
+
         BigDecimal totalReturn = finalValue.subtract(totalInvested);
-        BigDecimal estimatedTax = totalReturn.multiply(taxRate(simulation.getTimeMonths()));
-        BigDecimal netValue = finalValue.subtract(estimatedTax).setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal taxValue = taxRate(simulation.getTimeMonths());
+        BigDecimal estimatedTax = totalReturn.multiply(taxValue);
+
+        BigDecimal netValue = finalValue.subtract(estimatedTax)
+                .setScale(2, RoundingMode.HALF_UP);
 
         return buildResult(simulation, finalValue, totalInvested, totalReturn, estimatedTax, netValue);
     }
@@ -40,7 +46,7 @@ public class SimulationCalculatorService implements SimulationCalculator {
                 : BigDecimal.ZERO;
     }
 
-    private BigDecimal calculateFinalValue(InvestmentSimulation simulation, BigDecimal finalValue,BigDecimal monthlyRate) {
+    private BigDecimal calculateFinalValue(InvestmentSimulation simulation, BigDecimal finalValue, BigDecimal monthlyRate) {
         for (int month = 1; month <= simulation.getTimeMonths(); month++) {
             finalValue = finalValue
                     .multiply(BigDecimal.ONE.add(monthlyRate))
